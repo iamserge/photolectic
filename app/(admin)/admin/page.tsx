@@ -69,7 +69,7 @@ function StatCard({
 }: {
   title: string;
   value: number | string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   trend?: number;
   trendLabel?: string;
   variant?: "default" | "warning" | "success" | "danger";

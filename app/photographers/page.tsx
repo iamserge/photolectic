@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 async function getPhotographers() {
   const photographers = await db.user.findMany({
     where: {
-      role: "PHOTOGRAPHER",
+      roles: { has: "PHOTOGRAPHER" },
       photographerProfile: {
         isNot: null,
       },
