@@ -94,7 +94,7 @@ export default function GalleryPage() {
       );
 
     const matchesCategory =
-      selectedCategory === "all" || photo.category.toLowerCase() === selectedCategory;
+      selectedCategory === "all" || (photo.category && photo.category.toLowerCase() === selectedCategory);
 
     const matchesTags =
       selectedTags.length === 0 ||

@@ -12,10 +12,13 @@ import {
   ArrowLeft,
   Shield,
   CheckCircle,
+  Coins,
+  MessageSquare,
 } from "lucide-react";
 import { VerifiedBadge } from "@/components/brand/verified-badge";
-import { LicenseRequestButton } from "@/components/license-request-button";
+import { PurchaseButton } from "@/components/purchase-button";
 import { ShareButton } from "@/components/share-button";
+import { Button } from "@/components/ui/button";
 
 async function getPhoto(id: string) {
   const photo = await db.photo.findUnique({
@@ -39,6 +42,22 @@ async function getPhoto(id: string) {
   });
 
   return photo;
+}
+
+async function getUserPurchases(userId: string, photoId: string) {
+  const purchases = await db.purchase.findMany({
+    where: {
+      buyerId: userId,
+      photoId,
+      status: "COMPLETED",
+    },
+    select: {
+      licenseOptionId: true,
+      downloadToken: true,
+    },
+  });
+
+  return purchases;
 }
 
 async function getSimilarPhotos(photoId: string, photographerId: string) {
@@ -70,14 +89,15 @@ export default async function PhotoDetailPage({
     notFound();
   }
 
-  const similarPhotos = await getSimilarPhotos(id, photo.photographerId);
+  const [similarPhotos, userPurchases] = await Promise.all([
+    getSimilarPhotos(id, photo.photographerId),
+    session?.user?.id ? getUserPurchases(session.user.id, id) : Promise.resolve([]),
+  ]);
 
-  const formatPrice = (cents: number, currency: string) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency,
-    }).format(cents / 100);
-  };
+  // Create map of purchased licenses
+  const purchasedLicenses = new Map(
+    userPurchases.map((p) => [p.licenseOptionId, p.downloadToken])
+  );
 
   return (
     <div className="min-h-screen bg-[#0A0A0B]">
@@ -130,7 +150,7 @@ export default async function PhotoDetailPage({
                     <Aperture className="w-4 h-4 text-zinc-500" />
                     <div>
                       <p className="text-xs text-zinc-500">Aperture</p>
-                      <p className="text-sm text-white">f/{photo.aperture}</p>
+                      <p className="text-sm text-white">{photo.aperture.startsWith("f/") ? photo.aperture : `f/${photo.aperture}`}</p>
                     </div>
                   </div>
                 )}
@@ -139,13 +159,13 @@ export default async function PhotoDetailPage({
                     <Clock className="w-4 h-4 text-zinc-500" />
                     <div>
                       <p className="text-xs text-zinc-500">Shutter</p>
-                      <p className="text-sm text-white">{photo.shutterSpeed}s</p>
+                      <p className="text-sm text-white">{photo.shutterSpeed.endsWith("s") ? photo.shutterSpeed : `${photo.shutterSpeed}`}</p>
                     </div>
                   </div>
                 )}
                 {photo.iso && (
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-zinc-500 font-bold">ISO</span>
+                    <span className="text-xs text-zinc-500 font-bold w-4">ISO</span>
                     <div>
                       <p className="text-xs text-zinc-500">ISO</p>
                       <p className="text-sm text-white">{photo.iso}</p>
@@ -154,7 +174,7 @@ export default async function PhotoDetailPage({
                 )}
                 {photo.focalLength && (
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-zinc-500">mm</span>
+                    <span className="text-xs text-zinc-500 w-4">mm</span>
                     <div>
                       <p className="text-xs text-zinc-500">Focal Length</p>
                       <p className="text-sm text-white">{photo.focalLength}</p>
@@ -163,7 +183,7 @@ export default async function PhotoDetailPage({
                 )}
                 {photo.width && photo.height && (
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-zinc-500">px</span>
+                    <span className="text-xs text-zinc-500 w-4">px</span>
                     <div>
                       <p className="text-xs text-zinc-500">Resolution</p>
                       <p className="text-sm text-white">{photo.width} x {photo.height}</p>
@@ -264,21 +284,36 @@ export default async function PhotoDetailPage({
                   {photo.photographer.photographerProfile.bio}
                 </p>
               )}
+              {/* Request Custom Photo Button */}
+              <Link
+                href={`/dashboard/requests/new?photographer=${photo.photographerId}`}
+                className="mt-4 w-full"
+              >
+                <Button variant="outline" className="w-full border-zinc-700 hover:bg-zinc-800">
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  Request Custom Photo
+                </Button>
+              </Link>
             </div>
 
-            {/* Licensing Options */}
+            {/* Purchase Options */}
             <div className="p-6 rounded-2xl bg-zinc-900/50 border border-zinc-800">
               <div className="flex items-center gap-2 mb-4">
-                <Shield className="w-5 h-5 text-amber-500" />
-                <h3 className="text-lg font-semibold text-white">License This Photo</h3>
+                <Coins className="w-5 h-5 text-amber-500" />
+                <h3 className="text-lg font-semibold text-white">Buy This Photo</h3>
               </div>
+              <p className="text-sm text-zinc-400 mb-4">
+                Purchase with credits. 10 credits = $1
+              </p>
               <div className="space-y-3">
                 {photo.licenseOptions.map((option) => (
-                  <LicenseRequestButton
+                  <PurchaseButton
                     key={option.id}
                     photoId={photo.id}
                     licenseOption={option}
                     isAuthenticated={!!session?.user}
+                    isPurchased={purchasedLicenses.has(option.id)}
+                    downloadToken={purchasedLicenses.get(option.id)}
                   />
                 ))}
               </div>

@@ -402,12 +402,13 @@ const photos = [
   },
 ];
 
-// License options templates
+// License options templates (10 credits = $1)
 const licenseTemplates = [
   {
     type: LicenseType.PERSONAL,
     name: "Personal Use",
     priceCents: 2900,
+    credits: 29, // $2.90
     description: "For personal, non-commercial use only",
     usageTerms: "Single user, personal projects, no resale rights",
   },
@@ -415,6 +416,7 @@ const licenseTemplates = [
     type: LicenseType.EDITORIAL,
     name: "Editorial",
     priceCents: 9900,
+    credits: 99, // $9.90
     description: "For news, blog, and editorial content",
     usageTerms: "Online and print editorial use, photo credit required",
   },
@@ -422,6 +424,7 @@ const licenseTemplates = [
     type: LicenseType.COMMERCIAL,
     name: "Commercial",
     priceCents: 29900,
+    credits: 299, // $29.90
     description: "For commercial marketing and advertising",
     usageTerms: "Digital and print advertising, product packaging, unlimited impressions",
   },
@@ -429,6 +432,7 @@ const licenseTemplates = [
     type: LicenseType.EXTENDED,
     name: "Extended",
     priceCents: 99900,
+    credits: 999, // $99.90
     description: "Full commercial rights with extended usage",
     usageTerms: "All commercial uses, resale products, unlimited distribution",
   },
@@ -576,6 +580,7 @@ async function main() {
           type: template.type,
           name: template.name,
           priceCents: template.priceCents,
+          credits: template.credits,
           description: template.description,
           usageTerms: template.usageTerms,
         },
@@ -585,7 +590,7 @@ async function main() {
     console.log(`  ✓ Photo created: ${photo.title}`);
   }
 
-  // Create demo buyer
+  // Create demo buyer with starter credits
   console.log("\nCreating demo buyer...");
   const buyerPassword = await bcrypt.hash("buyer123456", 12);
   const buyer = await prisma.user.upsert({
@@ -599,7 +604,17 @@ async function main() {
       emailVerified: new Date(),
     },
   });
-  console.log(`  ✓ Buyer created: ${buyer.email}`);
+
+  // Create wallet with starter credits for demo buyer
+  await prisma.wallet.upsert({
+    where: { userId: buyer.id },
+    update: {},
+    create: {
+      userId: buyer.id,
+      balance: 500, // 500 credits = $50 to test purchases
+    },
+  });
+  console.log(`  ✓ Buyer created: ${buyer.email} (500 starter credits)`);
 
   console.log("\n╔══════════════════════════════════════════╗");
   console.log("║  Seed Complete!                          ║");
