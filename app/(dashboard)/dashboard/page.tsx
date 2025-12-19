@@ -1,11 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { VerifiedBadge } from "@/components/brand";
 import {
   Camera,
   Upload,
@@ -14,106 +14,39 @@ import {
   TrendingUp,
   Clock,
   CheckCircle,
-  AlertCircle,
   ArrowRight,
   Zap,
+  Loader2,
 } from "lucide-react";
 
-// Mock data - in production this would come from API/database
-const stats = [
-  {
-    title: "Total Photos",
-    value: "24",
-    change: "+3 this week",
-    icon: ImageIcon,
-    color: "text-amber-400",
-    bgColor: "bg-amber-500/10",
-  },
-  {
-    title: "Verified",
-    value: "21",
-    change: "87.5% rate",
-    icon: CheckCircle,
-    color: "text-emerald-400",
-    bgColor: "bg-emerald-500/10",
-  },
-  {
-    title: "Pending Review",
-    value: "3",
-    change: "~2 days avg",
-    icon: Clock,
-    color: "text-blue-400",
-    bgColor: "bg-blue-500/10",
-  },
-  {
-    title: "License Requests",
-    value: "8",
-    change: "2 new today",
-    icon: ShoppingBag,
-    color: "text-purple-400",
-    bgColor: "bg-purple-500/10",
-  },
-];
+interface DashboardData {
+  stats: {
+    totalPhotos: number;
+    verifiedPhotos: number;
+    pendingPhotos: number;
+    licenseRequests: number;
+    verificationRate: number;
+    newRequestsToday: number;
+    photosThisWeek: number;
+  };
+  recentPhotos: Array<{
+    id: string;
+    title: string;
+    src: string;
+    status: string;
+    requests: number;
+  }>;
+  recentRequests: Array<{
+    id: string;
+    photo: string;
+    buyer: string;
+    license: string;
+    status: string;
+    createdAt: string;
+  }>;
+}
 
-const recentPhotos = [
-  {
-    id: "1",
-    title: "Golden Hour Mountains",
-    src: "/images/seed/seed-landscape-01.webp",
-    status: "VERIFIED",
-    requests: 3,
-  },
-  {
-    id: "2",
-    title: "Urban Reflections",
-    src: "/images/seed/seed-street-07.webp",
-    status: "VERIFIED",
-    requests: 1,
-  },
-  {
-    id: "3",
-    title: "Portrait Study",
-    src: "/images/seed/seed-portrait-04.webp",
-    status: "PENDING_REVIEW",
-    requests: 0,
-  },
-  {
-    id: "4",
-    title: "Architectural Lines",
-    src: "/images/seed/seed-architecture-09.webp",
-    status: "VERIFIED",
-    requests: 2,
-  },
-];
-
-const recentRequests = [
-  {
-    id: "1",
-    photo: "Golden Hour Mountains",
-    buyer: "Creative Agency Inc.",
-    license: "Commercial",
-    status: "OPEN",
-    createdAt: "2 hours ago",
-  },
-  {
-    id: "2",
-    photo: "Urban Reflections",
-    buyer: "Magazine Publisher",
-    license: "Editorial",
-    status: "IN_REVIEW",
-    createdAt: "1 day ago",
-  },
-  {
-    id: "3",
-    photo: "Architectural Lines",
-    buyer: "Design Studio",
-    license: "Extended",
-    status: "APPROVED",
-    createdAt: "3 days ago",
-  },
-];
-
-const statusColors = {
+const statusColors: Record<string, string> = {
   VERIFIED: "status-verified",
   PENDING_REVIEW: "status-pending",
   REJECTED: "status-rejected",
@@ -124,6 +57,83 @@ const statusColors = {
 };
 
 export default function DashboardPage() {
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchDashboard() {
+      try {
+        const response = await fetch("/api/dashboard");
+        if (!response.ok) {
+          throw new Error("Failed to fetch dashboard data");
+        }
+        const result = await response.json();
+        setData(result);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Unknown error");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchDashboard();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-400 mb-4">{error || "Failed to load dashboard"}</p>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
+        </div>
+      </div>
+    );
+  }
+
+  const stats = [
+    {
+      title: "Total Photos",
+      value: data.stats.totalPhotos.toString(),
+      change: `+${data.stats.photosThisWeek} this week`,
+      icon: ImageIcon,
+      color: "text-amber-400",
+      bgColor: "bg-amber-500/10",
+    },
+    {
+      title: "Verified",
+      value: data.stats.verifiedPhotos.toString(),
+      change: `${data.stats.verificationRate}% rate`,
+      icon: CheckCircle,
+      color: "text-emerald-400",
+      bgColor: "bg-emerald-500/10",
+    },
+    {
+      title: "Pending Review",
+      value: data.stats.pendingPhotos.toString(),
+      change: "Awaiting review",
+      icon: Clock,
+      color: "text-blue-400",
+      bgColor: "bg-blue-500/10",
+    },
+    {
+      title: "License Requests",
+      value: data.stats.licenseRequests.toString(),
+      change: `${data.stats.newRequestsToday} new today`,
+      icon: ShoppingBag,
+      color: "text-purple-400",
+      bgColor: "bg-purple-500/10",
+    },
+  ];
+
   return (
     <div className="min-h-screen py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -215,52 +225,62 @@ export default function DashboardPage() {
                 </Link>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {recentPhotos.map((photo) => (
-                    <Link
-                      key={photo.id}
-                      href={`/dashboard/photos/${photo.id}`}
-                      className="group flex items-center gap-4 rounded-lg p-2 transition-colors hover:bg-white/5"
-                    >
-                      <div className="relative h-16 w-24 overflow-hidden rounded-lg">
-                        <Image
-                          src={photo.src}
-                          alt={photo.title}
-                          fill
-                          className="object-cover transition-transform group-hover:scale-105"
-                          sizes="96px"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate">{photo.title}</p>
-                        <div className="mt-1 flex items-center gap-2">
-                          <span
-                            className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs ${
-                              statusColors[photo.status as keyof typeof statusColors]
-                            }`}
-                          >
-                            {photo.status === "VERIFIED" && (
-                              <CheckCircle size={10} className="mr-1" />
-                            )}
-                            {photo.status === "PENDING_REVIEW" && (
-                              <Clock size={10} className="mr-1" />
-                            )}
-                            {photo.status.replace("_", " ")}
-                          </span>
-                          {photo.requests > 0 && (
-                            <span className="text-xs text-muted-foreground">
-                              {photo.requests} requests
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <ArrowRight
-                        size={16}
-                        className="text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
-                      />
+                {data.recentPhotos.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <ImageIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                    <p>No photos yet</p>
+                    <Link href="/dashboard/photos/new" className="text-amber-400 text-sm hover:underline">
+                      Upload your first photo
                     </Link>
-                  ))}
-                </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {data.recentPhotos.map((photo) => (
+                      <Link
+                        key={photo.id}
+                        href={`/gallery/${photo.id}`}
+                        className="group flex items-center gap-4 rounded-lg p-2 transition-colors hover:bg-white/5"
+                      >
+                        <div className="relative h-16 w-24 overflow-hidden rounded-lg bg-zinc-800">
+                          <Image
+                            src={photo.src}
+                            alt={photo.title}
+                            fill
+                            className="object-cover transition-transform group-hover:scale-105"
+                            sizes="96px"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium truncate">{photo.title}</p>
+                          <div className="mt-1 flex items-center gap-2">
+                            <span
+                              className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs ${
+                                statusColors[photo.status] || "bg-zinc-500/20 text-zinc-400"
+                              }`}
+                            >
+                              {photo.status === "VERIFIED" && (
+                                <CheckCircle size={10} className="mr-1" />
+                              )}
+                              {photo.status === "PENDING_REVIEW" && (
+                                <Clock size={10} className="mr-1" />
+                              )}
+                              {photo.status.replace("_", " ")}
+                            </span>
+                            {photo.requests > 0 && (
+                              <span className="text-xs text-muted-foreground">
+                                {photo.requests} requests
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <ArrowRight
+                          size={16}
+                          className="text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
+                        />
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </motion.div>
@@ -284,34 +304,42 @@ export default function DashboardPage() {
                 </Link>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {recentRequests.map((request) => (
-                    <Link
-                      key={request.id}
-                      href={`/dashboard/requests/${request.id}`}
-                      className="group flex items-center justify-between rounded-lg p-2 transition-colors hover:bg-white/5"
-                    >
-                      <div className="min-w-0">
-                        <p className="font-medium truncate">{request.photo}</p>
-                        <p className="text-sm text-muted-foreground truncate">
-                          {request.buyer} • {request.license}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span
-                          className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs ${
-                            statusColors[request.status as keyof typeof statusColors]
-                          }`}
-                        >
-                          {request.status.replace("_", " ")}
-                        </span>
-                        <span className="text-xs text-muted-foreground whitespace-nowrap">
-                          {request.createdAt}
-                        </span>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
+                {data.recentRequests.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <ShoppingBag className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                    <p>No license requests yet</p>
+                    <p className="text-sm">Requests will appear here when buyers are interested</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {data.recentRequests.map((request) => (
+                      <Link
+                        key={request.id}
+                        href={`/dashboard/requests/${request.id}`}
+                        className="group flex items-center justify-between rounded-lg p-2 transition-colors hover:bg-white/5"
+                      >
+                        <div className="min-w-0">
+                          <p className="font-medium truncate">{request.photo}</p>
+                          <p className="text-sm text-muted-foreground truncate">
+                            {request.buyer} &bull; {request.license}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span
+                            className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs ${
+                              statusColors[request.status] || "bg-zinc-500/20 text-zinc-400"
+                            }`}
+                          >
+                            {request.status.replace("_", " ")}
+                          </span>
+                          <span className="text-xs text-muted-foreground whitespace-nowrap">
+                            {request.createdAt}
+                          </span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </motion.div>

@@ -8,17 +8,14 @@ import {
   Aperture,
   Clock,
   Calendar,
-  MapPin,
-  User,
   Tag,
   ArrowLeft,
-  Heart,
-  Share2,
-  Download,
   Shield,
   CheckCircle,
 } from "lucide-react";
 import { VerifiedBadge } from "@/components/brand/verified-badge";
+import { LicenseRequestButton } from "@/components/license-request-button";
+import { ShareButton } from "@/components/share-button";
 
 async function getPhoto(id: string) {
   const photo = await db.photo.findUnique({
@@ -95,12 +92,7 @@ export default async function PhotoDetailPage({
             <span>Back to Gallery</span>
           </Link>
           <div className="flex items-center gap-3">
-            <button className="p-2 rounded-lg bg-zinc-800 text-zinc-400 hover:text-white transition-colors">
-              <Heart className="w-5 h-5" />
-            </button>
-            <button className="p-2 rounded-lg bg-zinc-800 text-zinc-400 hover:text-white transition-colors">
-              <Share2 className="w-5 h-5" />
-            </button>
+            <ShareButton title={photo.title} url={`/gallery/${id}`} />
           </div>
         </div>
       </div>
@@ -282,31 +274,23 @@ export default async function PhotoDetailPage({
               </div>
               <div className="space-y-3">
                 {photo.licenseOptions.map((option) => (
-                  <div
+                  <LicenseRequestButton
                     key={option.id}
-                    className="p-4 rounded-xl bg-zinc-800/50 border border-zinc-700 hover:border-amber-500/50 transition-colors"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-white font-semibold">{option.name}</h4>
-                      <span className="text-lg font-bold text-emerald-400">
-                        {formatPrice(option.priceCents, option.currency)}
-                      </span>
-                    </div>
-                    {option.description && (
-                      <p className="text-sm text-zinc-400 mb-3">{option.description}</p>
-                    )}
-                    <button className="w-full py-2 px-4 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-semibold text-sm transition-colors">
-                      Request License
-                    </button>
-                  </div>
+                    photoId={photo.id}
+                    licenseOption={option}
+                    isAuthenticated={!!session?.user}
+                  />
                 ))}
               </div>
               {photo.licenseOptions.length === 0 && (
                 <div className="text-center py-6">
                   <p className="text-zinc-500">Contact photographer for licensing</p>
-                  <button className="mt-3 px-6 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-semibold text-sm transition-colors">
-                    Contact Photographer
-                  </button>
+                  <Link
+                    href={`/photographer/${photo.photographer.photographerProfile?.handle || photo.photographer.id}`}
+                    className="mt-3 inline-block px-6 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-semibold text-sm transition-colors"
+                  >
+                    View Photographer Profile
+                  </Link>
                 </div>
               )}
             </div>

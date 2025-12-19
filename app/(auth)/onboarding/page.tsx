@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Camera,
   User,
   FileCheck,
   Shield,
@@ -16,8 +14,15 @@ import {
   Globe,
   Instagram,
   Twitter,
-  Upload,
   AlertTriangle,
+  Send,
+  Sparkles,
+  Zap,
+  Camera,
+  Image as ImageIcon,
+  Bot,
+  Copy,
+  ExternalLink,
 } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 
@@ -43,46 +48,60 @@ interface OnboardingData {
 }
 
 const steps = [
-  { id: 1, title: "Profile", icon: User, description: "Set up your photographer profile" },
-  { id: 2, title: "Social Links", icon: Globe, description: "Connect your online presence" },
-  { id: 3, title: "Verification", icon: Shield, description: "Identity & AML compliance" },
-  { id: 4, title: "Agreements", icon: FileCheck, description: "Review and accept terms" },
+  { id: 1, title: "Profile", icon: User, description: "Create your photographer identity" },
+  { id: 2, title: "Connect", icon: Globe, description: "Link your social presence" },
+  { id: 3, title: "Telegram", icon: Send, description: "Enable mobile uploads" },
+  { id: 4, title: "Verify", icon: Shield, description: "Complete identity verification" },
+  { id: 5, title: "Launch", icon: Sparkles, description: "Review and go live" },
 ];
 
 function StepIndicator({
   currentStep,
-  totalSteps,
 }: {
   currentStep: number;
-  totalSteps: number;
 }) {
   return (
-    <div className="flex items-center justify-center gap-2 mb-8">
+    <div className="flex items-center justify-center gap-1 mb-8">
       {steps.map((step, idx) => (
         <div key={step.id} className="flex items-center">
-          <div
+          <motion.div
+            initial={false}
+            animate={{
+              scale: idx + 1 === currentStep ? 1.1 : 1,
+              boxShadow: idx + 1 === currentStep ? "0 0 20px rgba(245, 158, 11, 0.4)" : "none",
+            }}
             className={`
-              flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300
+              relative flex items-center justify-center w-11 h-11 rounded-full transition-all duration-500
               ${idx + 1 < currentStep
-                ? "bg-emerald-500 text-white"
+                ? "bg-gradient-to-br from-emerald-400 to-emerald-600 text-white"
                 : idx + 1 === currentStep
-                ? "bg-amber-500 text-black"
-                : "bg-zinc-800 text-zinc-500"
+                ? "bg-gradient-to-br from-amber-400 to-amber-600 text-black"
+                : "bg-zinc-800/80 text-zinc-500 border border-zinc-700"
               }
             `}
           >
             {idx + 1 < currentStep ? (
-              <CheckCircle className="w-5 h-5" />
+              <motion.div
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+              >
+                <CheckCircle className="w-5 h-5" />
+              </motion.div>
             ) : (
               <step.icon className="w-5 h-5" />
             )}
-          </div>
+          </motion.div>
           {idx < steps.length - 1 && (
-            <div
-              className={`w-12 h-1 mx-2 rounded-full transition-all duration-300 ${
-                idx + 1 < currentStep ? "bg-emerald-500" : "bg-zinc-800"
-              }`}
-            />
+            <div className="relative w-8 h-1 mx-1">
+              <div className="absolute inset-0 bg-zinc-800 rounded-full" />
+              <motion.div
+                initial={false}
+                animate={{ width: idx + 1 < currentStep ? "100%" : "0%" }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
+                className="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full"
+              />
+            </div>
           )}
         </div>
       ))}
@@ -95,6 +114,9 @@ export default function OnboardingPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [telegramToken, setTelegramToken] = useState<string | null>(null);
+  const [telegramLinked, setTelegramLinked] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [data, setData] = useState<OnboardingData>({
     displayName: "",
     handle: "",
@@ -111,6 +133,31 @@ export default function OnboardingPage() {
     termsAccepted: false,
     amlAccepted: false,
   });
+
+  // Generate Telegram link token when reaching step 3
+  useEffect(() => {
+    if (currentStep === 3 && !telegramToken) {
+      generateTelegramToken();
+    }
+  }, [currentStep, telegramToken]);
+
+  const generateTelegramToken = async () => {
+    try {
+      const res = await fetch("/api/telegram/link", { method: "POST" });
+      if (res.ok) {
+        const { token } = await res.json();
+        setTelegramToken(token);
+      }
+    } catch (error) {
+      console.error("Failed to generate Telegram token:", error);
+    }
+  };
+
+  const copyToClipboard = async (text: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const updateData = (field: keyof OnboardingData, value: string | boolean) => {
     setData((prev) => ({ ...prev, [field]: value }));
@@ -132,12 +179,15 @@ export default function OnboardingPage() {
         // Social links are optional
         break;
       case 3:
+        // Telegram is optional
+        break;
+      case 4:
         if (!data.fullLegalName.trim()) newErrors.fullLegalName = "Legal name is required";
         if (!data.dateOfBirth) newErrors.dateOfBirth = "Date of birth is required";
         if (!data.country) newErrors.country = "Country is required";
         if (!data.idNumber.trim()) newErrors.idNumber = "ID number is required";
         break;
-      case 4:
+      case 5:
         if (!data.termsAccepted) newErrors.termsAccepted = "You must accept the terms";
         if (!data.amlAccepted) newErrors.amlAccepted = "You must accept the AML policy";
         break;
@@ -189,7 +239,7 @@ export default function OnboardingPage() {
         </div>
 
         {/* Step Indicator */}
-        <StepIndicator currentStep={currentStep} totalSteps={steps.length} />
+        <StepIndicator currentStep={currentStep} />
 
         {/* Card */}
         <motion.div
@@ -271,7 +321,7 @@ export default function OnboardingPage() {
               <>
                 <div>
                   <label className="block text-sm text-zinc-400 mb-2">Website</label>
-                  <div className="flex items-center px-4 py-3 rounded-xl bg-zinc-800 border border-zinc-700">
+                  <div className="flex items-center px-4 py-3 rounded-xl bg-zinc-800 border border-zinc-700 transition-all focus-within:ring-2 focus-within:ring-amber-500/50 focus-within:border-amber-500/50">
                     <Globe className="w-5 h-5 text-zinc-500 mr-2" />
                     <input
                       type="url"
@@ -285,7 +335,7 @@ export default function OnboardingPage() {
 
                 <div>
                   <label className="block text-sm text-zinc-400 mb-2">Instagram</label>
-                  <div className="flex items-center px-4 py-3 rounded-xl bg-zinc-800 border border-zinc-700">
+                  <div className="flex items-center px-4 py-3 rounded-xl bg-zinc-800 border border-zinc-700 transition-all focus-within:ring-2 focus-within:ring-pink-500/50 focus-within:border-pink-500/50">
                     <Instagram className="w-5 h-5 text-pink-400 mr-2" />
                     <span className="text-zinc-500">instagram.com/</span>
                     <input
@@ -300,7 +350,7 @@ export default function OnboardingPage() {
 
                 <div>
                   <label className="block text-sm text-zinc-400 mb-2">X (Twitter)</label>
-                  <div className="flex items-center px-4 py-3 rounded-xl bg-zinc-800 border border-zinc-700">
+                  <div className="flex items-center px-4 py-3 rounded-xl bg-zinc-800 border border-zinc-700 transition-all focus-within:ring-2 focus-within:ring-blue-500/50 focus-within:border-blue-500/50">
                     <Twitter className="w-5 h-5 text-blue-400 mr-2" />
                     <span className="text-zinc-500">x.com/</span>
                     <input
@@ -320,6 +370,112 @@ export default function OnboardingPage() {
             )}
 
             {currentStep === 3 && (
+              <>
+                {/* Telegram Integration Step */}
+                <div className="text-center mb-6">
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                    className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 mb-4"
+                  >
+                    <Send className="w-10 h-10 text-white" />
+                  </motion.div>
+                  <h3 className="text-xl font-bold text-white mb-2">Upload from Telegram</h3>
+                  <p className="text-zinc-400 text-sm max-w-md mx-auto">
+                    Connect your Telegram to upload photos directly from your phone.
+                    Just send photos to our bot and they&apos;ll appear in your dashboard!
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  {/* Features list */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {[
+                      { icon: Camera, title: "Instant Upload", desc: "Send photos directly" },
+                      { icon: Bot, title: "AI Auto-Tag", desc: "GPT-4.1 vision analysis" },
+                      { icon: Zap, title: "Quick Manage", desc: "View stats & requests" },
+                    ].map((feature, idx) => (
+                      <motion.div
+                        key={feature.title}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.1 }}
+                        className="p-4 rounded-xl bg-zinc-800/50 border border-zinc-700/50 text-center"
+                      >
+                        <feature.icon className="w-6 h-6 text-amber-400 mx-auto mb-2" />
+                        <p className="text-white text-sm font-medium">{feature.title}</p>
+                        <p className="text-zinc-500 text-xs">{feature.desc}</p>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* Connection instructions */}
+                  <div className="p-5 rounded-xl bg-gradient-to-br from-blue-500/10 to-blue-600/5 border border-blue-500/20">
+                    <p className="text-sm text-zinc-400 mb-3">
+                      <span className="text-blue-400 font-medium">Step 1:</span> Open Telegram and start a chat with our bot
+                    </p>
+                    <a
+                      href="https://t.me/PhotolecticBot"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-blue-500 hover:bg-blue-400 text-white font-semibold transition-colors"
+                    >
+                      <Send className="w-5 h-5" />
+                      Open @PhotolecticBot
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  </div>
+
+                  {telegramToken && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      className="p-5 rounded-xl bg-zinc-800/50 border border-zinc-700"
+                    >
+                      <p className="text-sm text-zinc-400 mb-3">
+                        <span className="text-amber-400 font-medium">Step 2:</span> Send this code to the bot
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <code className="flex-1 px-4 py-3 rounded-lg bg-zinc-900 border border-zinc-700 text-amber-400 font-mono text-lg tracking-wider text-center">
+                          /link {telegramToken}
+                        </code>
+                        <button
+                          onClick={() => copyToClipboard(`/link ${telegramToken}`)}
+                          className="p-3 rounded-lg bg-zinc-700 hover:bg-zinc-600 transition-colors"
+                        >
+                          {copied ? (
+                            <CheckCircle className="w-5 h-5 text-emerald-400" />
+                          ) : (
+                            <Copy className="w-5 h-5 text-zinc-400" />
+                          )}
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {telegramLinked ? (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center gap-3"
+                    >
+                      <CheckCircle className="w-6 h-6 text-emerald-400" />
+                      <div>
+                        <p className="text-emerald-400 font-medium">Telegram Connected!</p>
+                        <p className="text-zinc-400 text-sm">You can now upload photos via Telegram</p>
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <p className="text-sm text-zinc-500 text-center">
+                      You can skip this step and connect Telegram later from your dashboard
+                    </p>
+                  )}
+                </div>
+              </>
+            )}
+
+            {currentStep === 4 && (
               <>
                 <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 mb-6">
                   <div className="flex items-start gap-3">
@@ -413,54 +569,94 @@ export default function OnboardingPage() {
               </>
             )}
 
-            {currentStep === 4 && (
+            {currentStep === 5 && (
               <>
+                {/* Launch / Final Step */}
+                <div className="text-center mb-6">
+                  <motion.div
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                    className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 mb-4"
+                  >
+                    <Sparkles className="w-10 h-10 text-black" />
+                  </motion.div>
+                  <h3 className="text-xl font-bold text-white mb-2">Ready to Launch!</h3>
+                  <p className="text-zinc-400 text-sm">
+                    Accept our terms to complete your photographer profile
+                  </p>
+                </div>
+
                 <div className="space-y-4">
-                  <div className={`p-4 rounded-xl border ${errors.termsAccepted ? "border-red-500 bg-red-500/5" : "border-zinc-700 bg-zinc-800/50"}`}>
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className={`p-4 rounded-xl border transition-all ${errors.termsAccepted ? "border-red-500 bg-red-500/5" : data.termsAccepted ? "border-emerald-500/50 bg-emerald-500/5" : "border-zinc-700 bg-zinc-800/50"}`}
+                  >
                     <label className="flex items-start gap-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={data.termsAccepted}
-                        onChange={(e) => updateData("termsAccepted", e.target.checked)}
-                        className="w-5 h-5 mt-0.5 rounded bg-zinc-700 border-zinc-600 text-amber-500 focus:ring-amber-500"
-                      />
+                      <div className="relative mt-0.5">
+                        <input
+                          type="checkbox"
+                          checked={data.termsAccepted}
+                          onChange={(e) => updateData("termsAccepted", e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className={`w-6 h-6 rounded-lg border-2 transition-all ${data.termsAccepted ? "bg-emerald-500 border-emerald-500" : "bg-zinc-800 border-zinc-600"}`}>
+                          {data.termsAccepted && <CheckCircle className="w-5 h-5 text-white m-auto" />}
+                        </div>
+                      </div>
                       <div>
                         <p className="text-white font-medium">Terms of Service</p>
                         <p className="text-sm text-zinc-400 mt-1">
-                          I agree to Photolectic's Terms of Service, Privacy Policy, and Photo Licensing Agreement. I understand that my photos will be subject to verification before being published.
+                          I agree to Photolectic&apos;s Terms of Service, Privacy Policy, and Photo Licensing Agreement.
                         </p>
                         <a href="/terms" className="text-amber-500 text-sm hover:underline mt-2 inline-block">
                           Read full terms →
                         </a>
                       </div>
                     </label>
-                  </div>
+                  </motion.div>
 
-                  <div className={`p-4 rounded-xl border ${errors.amlAccepted ? "border-red-500 bg-red-500/5" : "border-zinc-700 bg-zinc-800/50"}`}>
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className={`p-4 rounded-xl border transition-all ${errors.amlAccepted ? "border-red-500 bg-red-500/5" : data.amlAccepted ? "border-emerald-500/50 bg-emerald-500/5" : "border-zinc-700 bg-zinc-800/50"}`}
+                  >
                     <label className="flex items-start gap-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={data.amlAccepted}
-                        onChange={(e) => updateData("amlAccepted", e.target.checked)}
-                        className="w-5 h-5 mt-0.5 rounded bg-zinc-700 border-zinc-600 text-amber-500 focus:ring-amber-500"
-                      />
+                      <div className="relative mt-0.5">
+                        <input
+                          type="checkbox"
+                          checked={data.amlAccepted}
+                          onChange={(e) => updateData("amlAccepted", e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className={`w-6 h-6 rounded-lg border-2 transition-all ${data.amlAccepted ? "bg-emerald-500 border-emerald-500" : "bg-zinc-800 border-zinc-600"}`}>
+                          {data.amlAccepted && <CheckCircle className="w-5 h-5 text-white m-auto" />}
+                        </div>
+                      </div>
                       <div>
                         <p className="text-white font-medium">AML & KYC Compliance</p>
                         <p className="text-sm text-zinc-400 mt-1">
-                          I consent to identity verification for Anti-Money Laundering (AML) compliance. I confirm that all information provided is accurate and that I am the rightful owner of the identification documents.
+                          I consent to identity verification for Anti-Money Laundering (AML) compliance.
                         </p>
                         <a href="/aml-policy" className="text-amber-500 text-sm hover:underline mt-2 inline-block">
                           Read AML policy →
                         </a>
                       </div>
                     </label>
-                  </div>
+                  </motion.div>
                 </div>
 
                 {errors.submit && (
-                  <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20">
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 mt-4"
+                  >
                     <p className="text-red-400 text-sm">{errors.submit}</p>
-                  </div>
+                  </motion.div>
                 )}
               </>
             )}
