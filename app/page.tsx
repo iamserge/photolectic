@@ -1,10 +1,10 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useInView, useMotionValue, useSpring } from "framer-motion";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Header, Footer } from "@/components/layout";
 import { Logo, VerifiedBadge } from "@/components/brand";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,34 @@ import {
   Eye,
   Lock,
   Award,
+  Upload,
+  Search,
+  Download,
+  CheckCircle,
+  Coins,
 } from "lucide-react";
+
+// Animated counter hook
+function useAnimatedCounter(end: number, duration: number = 2000) {
+  const [count, setCount] = useState(0);
+  const nodeRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(nodeRef, { once: true, margin: "-100px" });
+
+  useEffect(() => {
+    if (!inView) return;
+
+    let startTime: number;
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      setCount(Math.floor(progress * end));
+      if (progress < 1) requestAnimationFrame(animate);
+    };
+    requestAnimationFrame(animate);
+  }, [inView, end, duration]);
+
+  return { count, nodeRef };
+}
 
 // Dynamically import Three.js component to avoid SSR issues
 const HeroScene = dynamic(() => import("@/components/three/HeroScene"), {
@@ -42,11 +69,55 @@ const featuredPhotos = [
   { src: "/images/seed/seed-food-13.webp", category: "Food", photographer: "Emma Blanc" },
 ];
 
-const stats = [
-  { value: "50K+", label: "Verified Photos" },
-  { value: "2,500+", label: "Photographers" },
-  { value: "99.9%", label: "Authenticity Rate" },
-  { value: "100+", label: "Countries" },
+// Marquee photos - more for the infinite scroll effect
+const marqueePhotos = [
+  "/images/seed/seed-landscape-01.webp",
+  "/images/seed/seed-portrait-04.webp",
+  "/images/seed/seed-street-07.webp",
+  "/images/seed/seed-architecture-09.webp",
+  "/images/seed/seed-wildlife-11.webp",
+  "/images/seed/seed-travel-17.webp",
+  "/images/seed/seed-urban-19.webp",
+  "/images/seed/seed-food-13.webp",
+  "/images/seed/seed-landscape-02.webp",
+  "/images/seed/seed-portrait-05.webp",
+  "/images/seed/seed-abstract-15.webp",
+  "/images/seed/seed-abstract-16.webp",
+];
+
+interface StatItem {
+  value: number;
+  suffix: string;
+  label: string;
+  decimal?: boolean;
+}
+
+const stats: StatItem[] = [
+  { value: 50000, suffix: "+", label: "Verified Photos" },
+  { value: 2500, suffix: "+", label: "Photographers" },
+  { value: 99.9, suffix: "%", label: "Authenticity Rate", decimal: true },
+  { value: 100, suffix: "+", label: "Countries" },
+];
+
+const howItWorks = [
+  {
+    icon: Upload,
+    title: "Upload Your Work",
+    description: "Photographers upload their authentic photos with full EXIF metadata preserved.",
+    color: "from-amber-500 to-orange-500",
+  },
+  {
+    icon: ShieldCheck,
+    title: "AI Verification",
+    description: "Our system verifies authenticity, analyzes metadata, and auto-generates tags.",
+    color: "from-emerald-500 to-teal-500",
+  },
+  {
+    icon: Coins,
+    title: "Earn Credits",
+    description: "Buyers purchase with credits. Photographers keep 80% of every sale.",
+    color: "from-purple-500 to-pink-500",
+  },
 ];
 
 const features = [
@@ -75,6 +146,34 @@ const features = [
       "Photographers keep 80% of earnings. Your art, your income, your control.",
   },
 ];
+
+// Animated stat component
+function AnimatedStat({ stat, index }: { stat: StatItem; index: number }) {
+  const { count, nodeRef } = useAnimatedCounter(
+    stat.decimal ? Math.floor(stat.value * 10) : stat.value,
+    2000
+  );
+
+  const displayValue = stat.decimal ? (count / 10).toFixed(1) : count.toLocaleString();
+
+  return (
+    <motion.div
+      ref={nodeRef}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.1 }}
+      className="text-center"
+    >
+      <div className="text-5xl font-black text-amber-400 md:text-6xl tracking-tight">
+        {displayValue}{stat.suffix}
+      </div>
+      <div className="mt-2 text-sm font-medium text-muted-foreground uppercase tracking-wider">
+        {stat.label}
+      </div>
+    </motion.div>
+  );
+}
 
 export default function HomePage() {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -184,23 +283,89 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* Stats Section */}
+      {/* Infinite Photo Marquee */}
+      <section className="relative overflow-hidden py-8 bg-black/30">
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-transparent to-background z-10 pointer-events-none" />
+        <motion.div
+          className="flex gap-4"
+          animate={{ x: [0, -2400] }}
+          transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+        >
+          {[...marqueePhotos, ...marqueePhotos].map((src, i) => (
+            <div key={i} className="relative h-48 w-72 flex-shrink-0 overflow-hidden rounded-xl">
+              <Image
+                src={src}
+                alt=""
+                fill
+                className="object-cover"
+                sizes="288px"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+            </div>
+          ))}
+        </motion.div>
+      </section>
+
+      {/* Stats Section with Animated Counters */}
       <section className="relative border-y border-white/5 bg-black/50 py-20 backdrop-blur-xl">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
             {stats.map((stat, i) => (
+              <AnimatedStat key={stat.label} stat={stat} index={i} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-amber-500/5 to-transparent" />
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-16 text-center"
+          >
+            <h2 className="text-4xl font-black sm:text-5xl tracking-tight">
+              How It <span className="gradient-text">Works</span>
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-muted-foreground font-light text-lg">
+              From upload to earnings in three simple steps
+            </p>
+          </motion.div>
+
+          <div className="grid gap-8 md:grid-cols-3">
+            {howItWorks.map((step, i) => (
               <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, y: 20 }}
+                key={step.title}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="text-center"
+                transition={{ delay: i * 0.15 }}
+                className="relative group"
               >
-                <div className="text-5xl font-black text-amber-400 md:text-6xl tracking-tight">
-                  {stat.value}
+                {/* Connection line */}
+                {i < howItWorks.length - 1 && (
+                  <div className="hidden md:block absolute top-16 left-[60%] w-[80%] h-px bg-gradient-to-r from-white/20 to-transparent" />
+                )}
+
+                <div className="text-center">
+                  {/* Step number */}
+                  <div className="mb-4 text-7xl font-black text-white/5">
+                    0{i + 1}
+                  </div>
+
+                  {/* Icon */}
+                  <div className={`-mt-12 mb-6 inline-flex rounded-2xl bg-gradient-to-br ${step.color} p-5 text-white shadow-lg shadow-amber-500/20 group-hover:scale-110 transition-transform duration-300`}>
+                    <step.icon size={32} strokeWidth={1.5} />
+                  </div>
+
+                  <h3 className="mb-3 text-xl font-bold">{step.title}</h3>
+                  <p className="text-sm text-muted-foreground font-light leading-relaxed max-w-xs mx-auto">
+                    {step.description}
+                  </p>
                 </div>
-                <div className="mt-2 text-sm font-medium text-muted-foreground uppercase tracking-wider">{stat.label}</div>
               </motion.div>
             ))}
           </div>
