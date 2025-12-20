@@ -51,10 +51,10 @@ export default async function PhotographersPage() {
       <section className="pt-32 pb-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-5xl font-black tracking-tight sm:text-6xl">
+            <h1 className="text-5xl font-display font-bold uppercase tracking-tight sm:text-6xl">
               Meet Our <span className="gradient-text">Photographers</span>
             </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground font-light">
+            <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground font-body font-light">
               Talented creators from around the world, each verified and celebrated
               for their authentic human-made photography.
             </p>
@@ -146,7 +146,7 @@ export default async function PhotographersPage() {
           {photographers.length === 0 && (
             <div className="text-center py-20">
               <Camera size={48} className="mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-xl font-bold mb-2">No photographers yet</h3>
+              <h3 className="text-xl font-display font-bold uppercase mb-2">No photographers yet</h3>
               <p className="text-muted-foreground mb-6">Be the first to join our community!</p>
               <Link href="/register?role=photographer">
                 <Button className="bg-amber-500 hover:bg-amber-400 text-black font-bold">
@@ -161,7 +161,7 @@ export default async function PhotographersPage() {
       {/* CTA */}
       <section className="border-t border-white/5 bg-black/30 py-20">
         <div className="mx-auto max-w-4xl px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">
+          <h2 className="text-3xl font-display font-bold uppercase mb-4">
             Ready to showcase your work?
           </h2>
           <p className="text-muted-foreground mb-8">

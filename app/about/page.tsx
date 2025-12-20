@@ -51,10 +51,10 @@ export default function AboutPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <Logo size="xl" variant="icon" className="mx-auto mb-8" />
-            <h1 className="text-5xl font-black tracking-tight sm:text-6xl">
+            <h1 className="text-5xl font-display font-bold uppercase tracking-tight sm:text-6xl">
               Bringing <span className="gradient-text">Authenticity</span> Back
             </h1>
-            <p className="mx-auto mt-6 max-w-3xl text-xl text-muted-foreground font-light leading-relaxed">
+            <p className="mx-auto mt-6 max-w-3xl text-xl text-muted-foreground font-body font-light leading-relaxed">
               In a world where AI-generated images are becoming indistinguishable from reality,
               Photolectic stands as a beacon of authenticity. We verify and celebrate
               genuine human-made photography.
@@ -68,7 +68,7 @@ export default function AboutPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-12 lg:grid-cols-2 items-center">
             <div>
-              <h2 className="text-3xl font-bold mb-6">Our Mission</h2>
+              <h2 className="text-3xl font-display font-bold uppercase mb-6">Our Mission</h2>
               <p className="text-muted-foreground mb-4 leading-relaxed">
                 Photolectic was born from a simple observation: as AI-generated imagery floods
                 the internet, the value of authentic human photography has never been higher.
@@ -106,7 +106,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
             {stats.map((stat) => (
               <div key={stat.label} className="text-center">
-                <div className="text-4xl font-black text-amber-400 md:text-5xl">
+                <div className="text-4xl font-display font-bold text-amber-400 md:text-5xl">
                   {stat.value}
                 </div>
                 <div className="mt-2 text-sm text-muted-foreground uppercase tracking-wider">
@@ -122,7 +122,7 @@ export default function AboutPage() {
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Our Values</h2>
+            <h2 className="text-3xl font-display font-bold uppercase mb-4">Our Values</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               These principles guide everything we do at Photolectic.
             </p>
@@ -146,7 +146,7 @@ export default function AboutPage() {
       <section className="border-t border-white/5 bg-black/30 py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Built by Photographers, for Photographers</h2>
+            <h2 className="text-3xl font-display font-bold uppercase mb-4">Built by Photographers, for Photographers</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Our team combines decades of photography experience with deep expertise in
               technology, AI detection, and marketplace design.
@@ -173,7 +173,7 @@ export default function AboutPage() {
       {/* CTA */}
       <section className="py-20">
         <div className="mx-auto max-w-4xl px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">
+          <h2 className="text-3xl font-display font-bold uppercase mb-4">
             Join the Authenticity Movement
           </h2>
           <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">

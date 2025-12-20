@@ -44,6 +44,7 @@ Respond ONLY with valid JSON in this exact format:
             {
               type: "input_image",
               image_url: imageUrl,
+              detail: "auto",
             },
           ],
         },

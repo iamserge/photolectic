@@ -78,8 +78,8 @@ function LoginForm() {
             >
               <Logo size="lg" className="mb-8" />
 
-              <h1 className="text-3xl font-bold">Welcome back</h1>
-              <p className="mt-2 text-muted-foreground">
+              <h1 className="text-3xl font-display font-bold uppercase">Welcome back</h1>
+              <p className="mt-2 text-muted-foreground font-body">
                 Sign in to your account to continue
               </p>
 

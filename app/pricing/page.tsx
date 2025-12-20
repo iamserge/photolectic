@@ -84,10 +84,10 @@ export default function PricingPage() {
       <section className="pt-32 pb-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-5xl font-black tracking-tight sm:text-6xl">
+            <h1 className="text-5xl font-display font-bold uppercase tracking-tight sm:text-6xl">
               Simple, <span className="gradient-text">Transparent</span> Pricing
             </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground font-light">
+            <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground font-body font-light">
               Pay for what you need. No hidden fees, no surprises.
               Just authentic photography at fair prices.
             </p>
@@ -125,7 +125,7 @@ export default function PricingPage() {
                 </div>
 
                 <div className="mb-6">
-                  <span className="text-4xl font-black">{plan.price}</span>
+                  <span className="text-4xl font-display font-bold">{plan.price}</span>
                   <span className="text-muted-foreground ml-2">{plan.period}</span>
                 </div>
 
@@ -159,7 +159,7 @@ export default function PricingPage() {
       <section className="border-t border-white/5 bg-black/30 py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">
+            <h2 className="text-3xl font-display font-bold uppercase mb-4">
               For <span className="text-amber-400">Photographers</span>
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -189,7 +189,7 @@ export default function PricingPage() {
       {/* FAQ */}
       <section className="py-20">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12">
+          <h2 className="text-3xl font-display font-bold uppercase text-center mb-12">
             Frequently Asked Questions
           </h2>
 

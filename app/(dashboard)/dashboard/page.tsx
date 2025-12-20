@@ -143,8 +143,8 @@ export default function DashboardPage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="mt-2 text-muted-foreground">
+          <h1 className="text-3xl font-display font-bold uppercase">Dashboard</h1>
+          <p className="mt-2 text-muted-foreground font-body">
             Welcome back! Here&apos;s an overview of your photography portfolio.
           </p>
         </motion.div>
@@ -190,7 +190,7 @@ export default function DashboardPage() {
                   <div className="flex items-start justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">{stat.title}</p>
-                      <p className="mt-2 text-3xl font-bold">{stat.value}</p>
+                      <p className="mt-2 text-3xl font-display font-bold">{stat.value}</p>
                       <p className="mt-1 text-xs text-muted-foreground">
                         {stat.change}
                       </p>

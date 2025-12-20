@@ -118,6 +118,7 @@ Respond ONLY with JSON: {"title": "...", "description": "...", "tags": [...], "c
             {
               type: "input_image",
               image_url: imageUrl,
+              detail: "auto",
             },
           ],
         },

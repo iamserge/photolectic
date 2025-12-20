@@ -24,7 +24,7 @@ async function main() {
   
   // Verify all pending photos
   const updated = await prisma.photo.updateMany({
-    where: { status: "PENDING" },
+    where: { status: "PENDING_REVIEW" },
     data: { 
       status: "VERIFIED",
       verifiedAt: new Date(),

@@ -130,10 +130,10 @@ export default function GalleryPage() {
               animate={{ opacity: 1, y: 0 }}
               className="text-center"
             >
-              <h1 className="text-4xl font-bold sm:text-5xl">
+              <h1 className="text-4xl font-display font-bold uppercase sm:text-5xl">
                 Explore <span className="gradient-text">Verified</span> Photography
               </h1>
-              <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
+              <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground font-body">
                 Every photo authenticated. Every creator celebrated.
                 Discover genuine human-made photography from around the world.
               </p>
@@ -331,7 +331,7 @@ export default function GalleryPage() {
                 <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-white/5 flex items-center justify-center">
                   <Camera size={32} className="text-muted-foreground" />
                 </div>
-                <h3 className="text-lg font-semibold">No photos found</h3>
+                <h3 className="text-lg font-display font-bold uppercase">No photos found</h3>
                 <p className="mt-2 text-muted-foreground">
                   Try adjusting your search or filters
                 </p>

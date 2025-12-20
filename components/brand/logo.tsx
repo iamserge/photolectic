@@ -122,7 +122,7 @@ export function Logo({
   const Wordmark = () => (
     <span
       className={cn(
-        "font-semibold tracking-tight",
+        "font-display font-bold tracking-tight uppercase",
         textSize,
         "bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 bg-clip-text text-transparent"
       )}

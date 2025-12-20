@@ -1,7 +1,6 @@
 "use client";
 
 import { motion, useScroll, useTransform, useSpring, useInView } from "framer-motion";
-import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useEffect, useState } from "react";
@@ -10,7 +9,7 @@ import { VerifiedBadge } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { Camera, ArrowRight, Sparkles } from "lucide-react";
 
-// Smooth spring config for buttery animations
+// Smooth spring config
 const smoothSpring = { stiffness: 100, damping: 30, mass: 1 };
 
 // Animated counter with easing
@@ -37,16 +36,6 @@ function useAnimatedCounter(end: number, duration: number = 2000, decimal?: bool
 
   return { count: decimal ? count / 10 : count, nodeRef };
 }
-
-// Dynamic Three.js import
-const HeroScene = dynamic(() => import("@/components/three/HeroScene"), {
-  ssr: false,
-  loading: () => (
-    <div className="absolute inset-0 flex items-center justify-center">
-      <div className="h-40 w-40 rounded-full bg-amber-500/20 blur-3xl animate-pulse" />
-    </div>
-  ),
-});
 
 // Photo data
 const photos = [
@@ -82,12 +71,10 @@ export default function HomePage() {
     offset: ["start start", "end start"],
   });
 
-  // Smooth parallax values
   const heroY = useSpring(useTransform(scrollYProgress, [0, 1], [0, 150]), smoothSpring);
   const heroOpacity = useSpring(useTransform(scrollYProgress, [0, 0.6], [1, 0]), smoothSpring);
   const heroScale = useSpring(useTransform(scrollYProgress, [0, 0.6], [1, 0.9]), smoothSpring);
 
-  // Stats with animated counters
   const stat1 = useAnimatedCounter(50000, 2500);
   const stat2 = useAnimatedCounter(2500, 2500);
   const stat3 = useAnimatedCounter(99.9, 2500, true);
@@ -100,9 +87,64 @@ export default function HomePage() {
       <section ref={heroRef} className="relative min-h-screen overflow-hidden">
         <div className="absolute inset-0 hero-gradient" />
 
-        {/* 3D Scene */}
-        <div className="absolute inset-0 z-0">
-          <HeroScene className="h-full w-full" />
+        {/* Animated background elements */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          {/* Glowing orb */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+            <motion.div
+              className="w-[500px] h-[500px] rounded-full bg-amber-500/20 blur-[100px]"
+              animate={{
+                scale: [1, 1.2, 1],
+                opacity: [0.3, 0.5, 0.3],
+              }}
+              transition={{
+                duration: 8,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+          </div>
+
+          {/* Rotating rings */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+            <motion.div
+              className="w-[400px] h-[400px] rounded-full border border-amber-500/30"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            />
+            <motion.div
+              className="absolute inset-0 w-[500px] h-[500px] -top-[50px] -left-[50px] rounded-full border border-amber-500/20"
+              animate={{ rotate: -360 }}
+              transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+            />
+            <motion.div
+              className="absolute inset-0 w-[600px] h-[600px] -top-[100px] -left-[100px] rounded-full border border-amber-500/10"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+            />
+          </div>
+
+          {/* Floating particles */}
+          {[...Array(20)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 bg-amber-500/60 rounded-full"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                y: [0, -30, 0],
+                opacity: [0.3, 0.8, 0.3],
+              }}
+              transition={{
+                duration: 3 + Math.random() * 2,
+                repeat: Infinity,
+                delay: Math.random() * 2,
+                ease: "easeInOut",
+              }}
+            />
+          ))}
         </div>
 
         <div className="absolute inset-0 bg-gradient-radial from-transparent via-background/40 to-background z-[1]" />
@@ -129,8 +171,8 @@ export default function HomePage() {
               Verified human photography
             </motion.div>
 
-            {/* Headline with staggered reveal */}
-            <h1 className="mb-6 text-5xl font-extrabold tracking-tight sm:text-7xl lg:text-8xl overflow-hidden">
+            {/* Headline */}
+            <h1 className="mb-6 text-5xl font-display font-bold tracking-tight sm:text-7xl lg:text-8xl uppercase overflow-hidden">
               {["Real Photos.", "Real Humans.", "Real Trust."].map((line, i) => (
                 <motion.span
                   key={line}
@@ -153,7 +195,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.9, duration: 0.8 }}
-              className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground sm:text-xl leading-relaxed"
+              className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground sm:text-xl leading-relaxed font-body"
             >
               In an AI-saturated world, authenticity matters. Every photo verified as genuine human-made photography.
             </motion.p>
@@ -245,10 +287,10 @@ export default function HomePage() {
                 transition={{ delay: i * 0.1, duration: 0.6 }}
                 className="text-center"
               >
-                <div className="text-4xl font-black text-amber-400 sm:text-5xl md:text-6xl tracking-tight">
+                <div className="text-4xl font-display font-bold text-amber-400 sm:text-5xl md:text-6xl tracking-tight">
                   {stat.value}{stat.suffix}
                 </div>
-                <div className="mt-2 text-xs sm:text-sm text-muted-foreground uppercase tracking-widest">
+                <div className="mt-2 text-xs sm:text-sm text-muted-foreground uppercase tracking-widest font-body">
                   {stat.label}
                 </div>
               </motion.div>
@@ -267,10 +309,10 @@ export default function HomePage() {
             transition={{ duration: 0.7 }}
             className="mb-12 text-center"
           >
-            <h2 className="text-4xl font-black sm:text-5xl tracking-tight">
+            <h2 className="text-4xl font-display font-bold sm:text-5xl tracking-tight uppercase">
               Curated <span className="gradient-text">Excellence</span>
             </h2>
-            <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
+            <p className="mx-auto mt-4 max-w-xl text-muted-foreground font-body">
               Every photo verified. Every creator celebrated.
             </p>
           </motion.div>
@@ -308,7 +350,7 @@ export default function HomePage() {
                       initial={{ opacity: 0, y: 20 }}
                       whileHover={{ opacity: 1, y: 0 }}
                     >
-                      <p className="text-sm font-semibold text-amber-400 uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <p className="text-sm font-semibold text-amber-400 uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-display">
                         {photo.category}
                       </p>
                     </motion.div>
@@ -349,10 +391,10 @@ export default function HomePage() {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-4xl font-black sm:text-6xl tracking-tight mb-6">
+            <h2 className="text-4xl font-display font-bold sm:text-6xl tracking-tight mb-6 uppercase">
               Ready to join?
             </h2>
-            <p className="text-xl text-muted-foreground mb-10">
+            <p className="text-xl text-muted-foreground mb-10 font-body">
               Start sharing your authentic photography with the world.
             </p>
 

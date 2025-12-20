@@ -129,8 +129,8 @@ function RegisterForm() {
             >
               <Logo size="lg" className="mb-8" />
 
-              <h1 className="text-3xl font-bold">Create your account</h1>
-              <p className="mt-2 text-muted-foreground">
+              <h1 className="text-3xl font-display font-bold uppercase">Create your account</h1>
+              <p className="mt-2 text-muted-foreground font-body">
                 Join the authenticity movement
               </p>
 
