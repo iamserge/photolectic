@@ -7,7 +7,7 @@ import { useRef, useEffect, useState } from "react";
 import { Header, Footer } from "@/components/layout";
 import { VerifiedBadge } from "@/components/brand";
 import { Button } from "@/components/ui/button";
-import { Camera, ArrowRight, Sparkles } from "lucide-react";
+import { Camera, ArrowRight } from "lucide-react";
 
 // Smooth spring config
 const smoothSpring = { stiffness: 100, damping: 30, mass: 1 };
@@ -85,69 +85,73 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section ref={heroRef} className="relative min-h-screen overflow-hidden">
-        <div className="absolute inset-0 hero-gradient" />
+        {/* Sexy animated background */}
+        <div className="absolute inset-0 z-0">
+          {/* Base gradient */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black via-background to-background" />
 
-        {/* Animated background elements */}
-        <div className="absolute inset-0 z-0 overflow-hidden">
-          {/* Glowing orb */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            <motion.div
-              className="w-[500px] h-[500px] rounded-full bg-amber-500/20 blur-[100px]"
-              animate={{
-                scale: [1, 1.2, 1],
-                opacity: [0.3, 0.5, 0.3],
-              }}
-              transition={{
-                duration: 8,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-            />
-          </div>
+          {/* Aurora effect - flowing gradients */}
+          <motion.div
+            className="absolute inset-0"
+            animate={{
+              background: [
+                "radial-gradient(ellipse 80% 60% at 20% 40%, rgba(245,158,11,0.15) 0%, transparent 60%)",
+                "radial-gradient(ellipse 80% 60% at 80% 60%, rgba(245,158,11,0.15) 0%, transparent 60%)",
+                "radial-gradient(ellipse 80% 60% at 50% 30%, rgba(245,158,11,0.15) 0%, transparent 60%)",
+                "radial-gradient(ellipse 80% 60% at 20% 40%, rgba(245,158,11,0.15) 0%, transparent 60%)",
+              ],
+            }}
+            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          />
 
-          {/* Rotating rings */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            <motion.div
-              className="w-[400px] h-[400px] rounded-full border border-amber-500/30"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            />
-            <motion.div
-              className="absolute inset-0 w-[500px] h-[500px] -top-[50px] -left-[50px] rounded-full border border-amber-500/20"
-              animate={{ rotate: -360 }}
-              transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-            />
-            <motion.div
-              className="absolute inset-0 w-[600px] h-[600px] -top-[100px] -left-[100px] rounded-full border border-amber-500/10"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-            />
-          </div>
+          {/* Secondary aurora layer */}
+          <motion.div
+            className="absolute inset-0"
+            animate={{
+              background: [
+                "radial-gradient(ellipse 60% 80% at 70% 20%, rgba(217,119,6,0.1) 0%, transparent 50%)",
+                "radial-gradient(ellipse 60% 80% at 30% 70%, rgba(217,119,6,0.1) 0%, transparent 50%)",
+                "radial-gradient(ellipse 60% 80% at 60% 50%, rgba(217,119,6,0.1) 0%, transparent 50%)",
+                "radial-gradient(ellipse 60% 80% at 70% 20%, rgba(217,119,6,0.1) 0%, transparent 50%)",
+              ],
+            }}
+            transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+          />
 
-          {/* Floating particles */}
-          {[...Array(20)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-amber-500/60 rounded-full"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                y: [0, -30, 0],
-                opacity: [0.3, 0.8, 0.3],
-              }}
-              transition={{
-                duration: 3 + Math.random() * 2,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-                ease: "easeInOut",
-              }}
-            />
-          ))}
+          {/* Mesh gradient blobs */}
+          <motion.div
+            className="absolute w-[800px] h-[800px] -top-[200px] -left-[200px] rounded-full bg-amber-500/10 blur-[150px]"
+            animate={{
+              x: [0, 100, 50, 0],
+              y: [0, 50, 100, 0],
+              scale: [1, 1.2, 0.9, 1],
+            }}
+            transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute w-[600px] h-[600px] top-[20%] right-[-100px] rounded-full bg-orange-500/8 blur-[120px]"
+            animate={{
+              x: [0, -80, -40, 0],
+              y: [0, 80, 40, 0],
+              scale: [1, 0.8, 1.1, 1],
+            }}
+            transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+          />
+          <motion.div
+            className="absolute w-[500px] h-[500px] bottom-[10%] left-[30%] rounded-full bg-yellow-500/5 blur-[100px]"
+            animate={{
+              x: [0, 60, -30, 0],
+              y: [0, -40, 20, 0],
+              scale: [1, 1.3, 1, 1],
+            }}
+            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 5 }}
+          />
+
+          {/* Subtle grain overlay */}
+          <div className="absolute inset-0 opacity-[0.015]" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+          }} />
         </div>
-
-        <div className="absolute inset-0 bg-gradient-radial from-transparent via-background/40 to-background z-[1]" />
 
         {/* Hero Content */}
         <motion.div
@@ -158,32 +162,21 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1] }}
-            className="max-w-4xl"
+            className="max-w-6xl"
           >
-            {/* Badge */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-              className="mb-8 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-5 py-2.5 text-sm font-medium text-amber-400 backdrop-blur-sm"
-            >
-              <Sparkles size={16} className="animate-pulse" />
-              Verified human photography
-            </motion.div>
-
-            {/* Headline */}
-            <h1 className="mb-6 text-5xl font-display font-bold tracking-tight sm:text-7xl lg:text-8xl uppercase overflow-hidden">
+            {/* Massive Headline */}
+            <h1 className="mb-8 font-display font-bold tracking-tighter uppercase overflow-hidden">
               {["Real Photos.", "Real Humans.", "Real Trust."].map((line, i) => (
                 <motion.span
                   key={line}
-                  initial={{ opacity: 0, y: 60 }}
+                  initial={{ opacity: 0, y: 80 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{
-                    delay: 0.4 + i * 0.15,
-                    duration: 0.9,
+                    delay: 0.2 + i * 0.12,
+                    duration: 1,
                     ease: [0.25, 0.1, 0.25, 1]
                   }}
-                  className={`block ${i === 1 ? "gradient-text" : "text-foreground"}`}
+                  className={`block text-6xl sm:text-8xl md:text-9xl lg:text-[10rem] xl:text-[12rem] leading-[0.85] ${i === 1 ? "gradient-text" : "text-foreground"}`}
                 >
                   {line}
                 </motion.span>
@@ -194,25 +187,25 @@ export default function HomePage() {
             <motion.p
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.9, duration: 0.8 }}
-              className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground sm:text-xl leading-relaxed font-body"
+              transition={{ delay: 0.7, duration: 0.8 }}
+              className="mx-auto mb-12 max-w-2xl text-xl text-muted-foreground sm:text-2xl leading-relaxed font-body font-light"
             >
-              In an AI-saturated world, authenticity matters. Every photo verified as genuine human-made photography.
+              In an AI-saturated world, authenticity matters.
             </motion.p>
 
             {/* CTAs */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.1, duration: 0.8 }}
+              transition={{ delay: 0.9, duration: 0.8 }}
               className="flex flex-col items-center justify-center gap-4 sm:flex-row"
             >
               <Link href="/register?role=photographer">
                 <Button
                   size="lg"
-                  className="h-14 gap-2 bg-amber-500 px-8 text-lg font-bold text-black hover:bg-amber-400 transition-all duration-500 hover:scale-105 hover:shadow-[0_0_40px_rgba(245,158,11,0.4)]"
+                  className="h-16 gap-3 bg-amber-500 px-10 text-xl font-bold text-black hover:bg-amber-400 transition-all duration-500 hover:scale-105 hover:shadow-[0_0_60px_rgba(245,158,11,0.4)]"
                 >
-                  <Camera size={20} />
+                  <Camera size={24} />
                   Start Uploading
                 </Button>
               </Link>
@@ -220,10 +213,10 @@ export default function HomePage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="h-14 gap-2 border-white/20 px-8 text-lg font-semibold hover:bg-white/5 backdrop-blur-sm transition-all duration-500 hover:scale-105"
+                  className="h-16 gap-3 border-white/20 px-10 text-xl font-semibold hover:bg-white/5 backdrop-blur-sm transition-all duration-500 hover:scale-105"
                 >
                   Browse Gallery
-                  <ArrowRight size={20} />
+                  <ArrowRight size={24} />
                 </Button>
               </Link>
             </motion.div>
@@ -233,13 +226,13 @@ export default function HomePage() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.8, duration: 1 }}
+            transition={{ delay: 1.5, duration: 1 }}
             className="absolute bottom-8 left-1/2 -translate-x-1/2"
           >
             <motion.div
               animate={{ y: [0, 12, 0] }}
               transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
-              className="h-14 w-px bg-gradient-to-b from-amber-500/60 to-transparent"
+              className="h-16 w-px bg-gradient-to-b from-amber-500/60 to-transparent"
             />
           </motion.div>
         </motion.div>
