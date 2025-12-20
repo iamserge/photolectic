@@ -38,7 +38,7 @@ const eslintConfig = defineConfig([
           ],
         },
       ],
-      // Brand color enforcement (warning for inline color usage)
+      // Brand color and typography enforcement
       "no-restricted-syntax": [
         "error",
         {
@@ -64,6 +64,24 @@ const eslintConfig = defineConfig([
       ],
       // Enforce using cn() for className merging
       "no-template-curly-in-string": "off",
+    },
+  },
+  // Typography enforcement for pages and components
+  {
+    files: ["app/**/*.tsx", "components/**/*.tsx"],
+    rules: {
+      // Reminder to use font-display for headings (warning only)
+      "no-restricted-syntax": [
+        "warn",
+        {
+          selector: "JSXElement[openingElement.name.name='h1']:not(:has(JSXAttribute[name.name='className'][value.value=/font-display/]))",
+          message: "Consider using 'font-display' class for h1 headings (Bebas Neue)",
+        },
+        {
+          selector: "JSXElement[openingElement.name.name='h2']:not(:has(JSXAttribute[name.name='className'][value.value=/font-display/]))",
+          message: "Consider using 'font-display' class for h2 headings (Bebas Neue)",
+        },
+      ],
     },
   },
   // Component-specific rules

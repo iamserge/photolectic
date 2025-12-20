@@ -198,26 +198,33 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.9, duration: 0.8 }}
-              className="flex flex-col items-center justify-center gap-4 sm:flex-row"
+              className="flex flex-col items-center justify-center gap-6 sm:flex-row"
             >
               <Link href="/register?role=photographer">
-                <Button
-                  size="lg"
-                  className="h-16 gap-3 bg-amber-500 px-10 text-xl font-bold text-black hover:bg-amber-400 transition-all duration-500 hover:scale-105 hover:shadow-[0_0_60px_rgba(245,158,11,0.4)]"
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="group relative h-20 px-14 font-display text-2xl uppercase tracking-wide text-black bg-amber-500 rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-[0_0_80px_rgba(245,158,11,0.5)]"
                 >
-                  <Camera size={24} />
-                  Start Uploading
-                </Button>
+                  <span className="relative z-10 flex items-center gap-4">
+                    <Camera size={28} strokeWidth={2.5} />
+                    Start Uploading
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                </motion.button>
               </Link>
               <Link href="/gallery">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="h-16 gap-3 border-white/20 px-10 text-xl font-semibold hover:bg-white/5 backdrop-blur-sm transition-all duration-500 hover:scale-105"
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="group relative h-20 px-14 font-display text-2xl uppercase tracking-wide text-white border-2 border-white/20 rounded-2xl overflow-hidden backdrop-blur-sm transition-all duration-500 hover:border-amber-500/50"
                 >
-                  Browse Gallery
-                  <ArrowRight size={24} />
-                </Button>
+                  <span className="relative z-10 flex items-center gap-4">
+                    Browse Gallery
+                    <ArrowRight size={28} strokeWidth={2.5} />
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-amber-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                </motion.button>
               </Link>
             </motion.div>
           </motion.div>
@@ -357,17 +364,20 @@ export default function HomePage() {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="mt-12 text-center"
+            className="mt-16 text-center"
           >
             <Link href="/gallery">
-              <Button
-                variant="outline"
-                size="lg"
-                className="gap-2 border-white/20 hover:bg-white/5 font-semibold px-8 h-14 text-lg transition-all duration-500 hover:scale-105"
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.98 }}
+                className="group relative h-16 px-12 font-display text-xl uppercase tracking-wide text-white border-2 border-white/20 rounded-xl overflow-hidden backdrop-blur-sm transition-all duration-500 hover:border-amber-500/50"
               >
-                View All Photos
-                <ArrowRight size={18} />
-              </Button>
+                <span className="relative z-10 flex items-center gap-3">
+                  View All Photos
+                  <ArrowRight size={22} strokeWidth={2.5} />
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-amber-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              </motion.button>
             </Link>
           </motion.div>
         </div>
@@ -392,13 +402,17 @@ export default function HomePage() {
             </p>
 
             <Link href="/register">
-              <Button
-                size="lg"
-                className="h-16 gap-2 bg-amber-500 px-12 text-xl font-bold text-black hover:bg-amber-400 transition-all duration-500 hover:scale-105 hover:shadow-[0_0_60px_rgba(245,158,11,0.5)]"
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.98 }}
+                className="group relative h-20 px-16 font-display text-2xl uppercase tracking-wide text-black bg-amber-500 rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-[0_0_100px_rgba(245,158,11,0.6)]"
               >
-                <Camera size={24} />
-                Get Started
-              </Button>
+                <span className="relative z-10 flex items-center gap-4">
+                  <Camera size={28} strokeWidth={2.5} />
+                  Get Started
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              </motion.button>
             </Link>
           </motion.div>
         </div>
