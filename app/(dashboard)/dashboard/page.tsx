@@ -168,7 +168,7 @@ export default function DashboardPage() {
               Manage Photos
             </Button>
           </Link>
-          <Link href="/integrations/telegram">
+          <Link href="/settings/telegram">
             <Button variant="outline" className="gap-2 border-white/20">
               <Zap size={18} />
               Connect Telegram
@@ -296,12 +296,9 @@ export default function DashboardPage() {
                 <CardTitle className="text-lg font-semibold">
                   License Requests
                 </CardTitle>
-                <Link
-                  href="/dashboard/requests"
-                  className="text-sm text-amber-400 hover:text-amber-300"
-                >
-                  View all
-                </Link>
+                <span className="text-sm text-muted-foreground">
+                  {data.recentRequests.length} pending
+                </span>
               </CardHeader>
               <CardContent>
                 {data.recentRequests.length === 0 ? (
@@ -313,10 +310,9 @@ export default function DashboardPage() {
                 ) : (
                   <div className="space-y-4">
                     {data.recentRequests.map((request) => (
-                      <Link
+                      <div
                         key={request.id}
-                        href={`/dashboard/requests/${request.id}`}
-                        className="group flex items-center justify-between rounded-lg p-2 transition-colors hover:bg-white/5"
+                        className="flex items-center justify-between rounded-lg p-2 bg-white/5"
                       >
                         <div className="min-w-0">
                           <p className="font-medium truncate">{request.photo}</p>
@@ -336,7 +332,7 @@ export default function DashboardPage() {
                             {request.createdAt}
                           </span>
                         </div>
-                      </Link>
+                      </div>
                     ))}
                   </div>
                 )}

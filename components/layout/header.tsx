@@ -138,9 +138,9 @@ export function Header({ user }: HeaderProps) {
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem asChild>
-                      <Link href="/dashboard/requests" className="cursor-pointer">
+                      <Link href="/dashboard/purchases" className="cursor-pointer">
                         <ShoppingBag className="mr-2 h-4 w-4" />
-                        License Requests
+                        Purchases
                       </Link>
                     </DropdownMenuItem>
                     {isAdmin && (

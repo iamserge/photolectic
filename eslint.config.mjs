@@ -2,6 +2,138 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 
+// Valid internal routes for the application
+// Update this list when adding new pages
+const VALID_ROUTES = [
+  // Public routes
+  "/",
+  "/about",
+  "/blog",
+  "/careers",
+  "/contact",
+  "/docs/api",
+  "/gallery",
+  "/license-agreement",
+  "/photographers",
+  "/pricing",
+  "/privacy",
+  "/terms",
+  // Auth routes
+  "/login",
+  "/register",
+  "/onboarding",
+  // Dashboard routes
+  "/dashboard",
+  "/dashboard/photos",
+  "/dashboard/photos/new",
+  "/dashboard/purchases",
+  "/dashboard/wallet",
+  "/settings",
+  "/settings/telegram",
+  // Admin routes
+  "/admin",
+  "/admin/photos",
+  "/admin/upload",
+  "/admin/licenses",
+  "/admin/users",
+  // API routes (for signout etc)
+  "/api/auth/signout",
+];
+
+// Dynamic route patterns (regex-like patterns for dynamic segments)
+const VALID_DYNAMIC_PATTERNS = [
+  "/blog/",           // /blog/[slug]
+  "/careers/",        // /careers/[slug]
+  "/gallery/",        // /gallery/[id]
+  "/photographer/",   // /photographer/[handle]
+];
+
+// Custom ESLint rule to validate internal links
+const internalLinksRule = {
+  meta: {
+    type: "problem",
+    docs: {
+      description: "Ensure internal links point to valid routes",
+    },
+    messages: {
+      invalidRoute: "Invalid internal route '{{route}}'. This page does not exist. Valid routes: check VALID_ROUTES in eslint.config.mjs",
+    },
+  },
+  create(context) {
+    return {
+      JSXAttribute(node) {
+        // Only check href attributes
+        if (node.name.name !== "href") return;
+
+        // Get the value
+        const value = node.value;
+        if (!value) return;
+
+        let href = null;
+
+        // Handle string literals: href="/path"
+        if (value.type === "Literal" && typeof value.value === "string") {
+          href = value.value;
+        }
+        // Handle template literals: href={`/path`} (simple case without expressions)
+        else if (
+          value.type === "JSXExpressionContainer" &&
+          value.expression.type === "TemplateLiteral" &&
+          value.expression.expressions.length === 0
+        ) {
+          href = value.expression.quasis[0].value.cooked;
+        }
+
+        if (!href) return;
+
+        // Skip external links, anchors, mailto, tel, etc.
+        if (
+          href.startsWith("http://") ||
+          href.startsWith("https://") ||
+          href.startsWith("#") ||
+          href.startsWith("mailto:") ||
+          href.startsWith("tel:") ||
+          href === ""
+        ) {
+          return;
+        }
+
+        // Must be an internal link starting with /
+        if (!href.startsWith("/")) return;
+
+        // Remove query strings and hash for validation
+        const cleanPath = href.split("?")[0].split("#")[0];
+
+        // Check if it's a valid static route
+        if (VALID_ROUTES.includes(cleanPath)) return;
+
+        // Check if it matches a dynamic route pattern
+        const matchesDynamic = VALID_DYNAMIC_PATTERNS.some(pattern =>
+          cleanPath.startsWith(pattern) && cleanPath.length > pattern.length
+        );
+        if (matchesDynamic) return;
+
+        // Special case: /api/* routes are generally valid
+        if (cleanPath.startsWith("/api/")) return;
+
+        // Report invalid route
+        context.report({
+          node,
+          messageId: "invalidRoute",
+          data: { route: cleanPath },
+        });
+      },
+    };
+  },
+};
+
+// Custom plugin with our internal links rule
+const customPlugin = {
+  rules: {
+    "valid-internal-links": internalLinksRule,
+  },
+};
+
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
@@ -100,6 +232,16 @@ const eslintConfig = defineConfig([
     rules: {
       // Enforce error handling in API routes
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+    },
+  },
+  // Custom internal links validation
+  {
+    files: ["**/*.{tsx,jsx}"],
+    plugins: {
+      "photolectic": customPlugin,
+    },
+    rules: {
+      "photolectic/valid-internal-links": "error",
     },
   },
 ]);

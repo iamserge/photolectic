@@ -108,12 +108,13 @@ function LoginForm() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="password">Password</Label>
-                    <Link
-                      href="/forgot-password"
+                    <button
+                      type="button"
+                      onClick={() => toast.info("Password reset coming soon. Contact support@photolectic.com")}
                       className="text-sm text-amber-400 hover:text-amber-300"
                     >
                       Forgot password?
-                    </Link>
+                    </button>
                   </div>
                   <div className="relative">
                     <Lock

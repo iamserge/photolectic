@@ -641,7 +641,7 @@ export default function OnboardingPage() {
                         <p className="text-sm text-zinc-400 mt-1">
                           I consent to identity verification for Anti-Money Laundering (AML) compliance.
                         </p>
-                        <a href="/aml-policy" className="text-amber-500 text-sm hover:underline mt-2 inline-block">
+                        <a href="/terms" className="text-amber-500 text-sm hover:underline mt-2 inline-block">
                           Read AML policy →
                         </a>
                       </div>

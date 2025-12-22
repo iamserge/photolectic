@@ -284,14 +284,14 @@ export default async function PhotoDetailPage({
                   {photo.photographer.photographerProfile.bio}
                 </p>
               )}
-              {/* Request Custom Photo Button */}
+              {/* Contact Photographer Button */}
               <Link
-                href={`/dashboard/requests/new?photographer=${photo.photographerId}`}
+                href={`/photographer/${photo.photographer.photographerProfile?.handle || photo.photographerId}`}
                 className="mt-4 w-full"
               >
                 <Button variant="outline" className="w-full border-zinc-700 hover:bg-zinc-800">
                   <MessageSquare className="w-4 h-4 mr-2" />
-                  Request Custom Photo
+                  View Full Profile
                 </Button>
               </Link>
             </div>
